@@ -1,0 +1,183 @@
+{
+"resourceType": "Bundle",
+"type": "document",
+"entry": [
+	{
+		"resource":
+		{
+			"resourceType": "practitioner",
+			"id": "practitioner1",
+			"identifier": [
+				{
+					"value":"12345"
+				}
+			],
+			"name": {
+				"text" : "PFirstName PLastName"
+			
+			},
+			"practitionerRole": {
+				"managingOrganization": 
+				{
+					"reference":"#organization1"
+				}
+			}
+		}
+
+	},
+	{
+		"resource":
+		{
+			"resourceType": "patient",
+			"id":"patient1",
+			"identifier" : [
+				{
+					"type":"DL",
+					"value":"0123456789"
+				}
+
+			],
+			"name" : {
+				"text" : "PFname PMname PLname"
+			},
+			"telecom" : [
+				{
+					"system":"email",
+					"value":"testemail@test.com"
+				},
+				{
+					"system":"phone",
+					"value":"1234567890"
+				}
+
+			],
+			"gender" : "male",
+			"birthDate": "1999-12-25"
+		}
+
+	},
+	{
+		"resource":
+		{
+			"resourceType": "immunization",
+
+			"date": "2013-01-10",
+			"vaccineType": {
+				"coding": [
+					{
+						"code": "01003492815890581716082810U4275AA"
+					}
+				],
+				"text": "Men-C"
+			},
+			"patient": {
+				"reference": "#patient1"
+			},
+			"wasNotGiven": false,
+
+			"reported": "false",
+
+			"performer": {
+				"reference": "#practitioner1"
+			},
+			"manufacture": {
+				"reference": "#organization2"
+			},
+			"location": {
+				"reference": "#location1"
+			},
+			"lotNumber": "U4275AA",
+			"expirationDate": "2016-08-28",
+			"site": {
+				"coding": [
+					{
+						"code": "LA"
+					}
+				]
+			},
+			"route": {
+				"coding": [
+					{
+						"code": "C38290"
+					}
+				]
+			},
+			"doseQuantity": { 
+				"value": "1.0 ml"
+			}
+
+		}
+
+	},
+	{
+		"resource":
+		{
+			"resourceType": "ConsentDirective",
+			"issued": "2015-04-14",
+			"subject": {
+				"reference": "#patient1"
+			},
+			"signer" : {
+				"type": {
+					"coding" : [
+						{
+							"code": "1.2.840.10065.1.12.1.7"
+						}
+
+					]
+				},
+				"party": {
+					"reference": "#RelatedPerson1"
+				}
+			}
+			
+		}
+
+	},
+	{
+		"resource":
+		{
+			"resourceType": "RelatedPerson",
+			"id": "RelatedPerson1",
+			"relationship": {
+				"coding": [
+					{
+						"code": "parent"
+					}
+				],
+				"text": "Parent"
+
+			},
+			"name": {
+				"text" : "Ppfirst Ppmiddle Pplast"
+			}
+		}
+
+	},
+	{
+		"resource":
+
+		{
+			"resourceType": "Organization",
+			"id":"organization1",
+			"name":"Grey Bruce"
+		}
+	},
+	{
+		"resource":
+		{
+			"resourceType": "Organization",
+			"id":"organization2",
+			"name":"GlaxoSmithKline"
+		}
+	},
+	{
+		"resource":
+		{
+			"resourceType": "location",
+			"id":"location1",
+			"description":"Dr. Bob office"
+		}
+	}
+	]
+}

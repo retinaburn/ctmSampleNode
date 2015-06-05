@@ -1,0 +1,138 @@
+{
+  "resource": {
+    "resourceType": "Bundle",
+    "type": "document",
+    "entry": [
+    {
+      "resourceType": "Practitioner",
+      "identifier": [
+        {
+          "use": "official",
+          "system": "uri",
+          "value": "123456789"
+        }
+      ],
+      "name": {
+        "resourceType": "HumanName",
+        "use": "official",
+        "text": "John Abraham Smith",
+        "family": [
+          "Smith"
+        ],
+        "given": [
+          "John",
+          "Abraham"
+        ],
+        "prefix": [
+          "Dr"
+        ]
+      },
+      "telecom": [
+        {
+          "resourceType": "ContactPoint",
+          "system": "phone",
+          "value": "416-888-4500",
+          "use": "work"
+        }
+      ],
+      "address": [
+        {
+          "resourceType": "Address",
+          "use": "work",
+          "text": "120 Bloor Street East",
+          "line": [
+            "120 Bloor Street East"
+          ],
+          "city": "Toronto",
+          "state": "ON",
+          "postalCode": "M4W 1B7",
+          "country": "CAN"
+        }
+      ]
+    },
+    {
+      "resourceType": "Patient",
+      "identifier": [
+        {
+          "use": "usual",
+          "system": "ontario health card",
+          "value": "RJ9322046"
+        }
+      ],
+      "name": [
+        {
+          "resourceType": "HumanName",
+          "use": "usual",
+          "text": "Adam Stanley",
+          "family": [
+            "Stanley"
+          ],
+          "given": [
+            "Adam"
+          ]
+        }
+      ],
+      "telecom": [
+        {
+          "resourceType": "ContactPoint",
+          "system": "email",
+          "value": "adams@ca.ibm.com",
+          "use": "work"
+        }
+      ],
+      "gender": "male",
+      "birthDate": "2004-05-25",
+      "address": [
+        {
+          "resourceType": "Address",
+          "use": "home",
+          "text": "123 Fake Street, Oakville ON",
+          "line": [
+            "123 Fake Street"
+          ],
+          "city": "Oakville",
+          "state": "ON",
+          "postalCode": "A1B 2C3",
+          "country": "CAN"
+        }
+      ]
+    },
+    {
+      "resourceType": "Immunization",
+      "date": "2015-04-22 09:30:00",
+      "vaccineType": {
+        "coding": [
+          {
+            "system": "VIDS",
+            "code": "697177000843",
+            "display": "Adacel"
+          }
+        ],
+        "text": "Tetanus & diphtheria toxoids adsorbed combined with component pertusis vaccine"
+      },
+      "patient": {},
+      "performer": {},
+      "manufacturer": {
+        "resourceType": "Organization",
+        "name": "Sanofi Pasteur Limited"
+      },
+      "lotNumber": "C3919AA",
+      "expirationDate": "",
+      "site": {
+        "coding": [
+          {
+            "system": "uri",
+            "code": "IM",
+            "display": "Intramuscular"
+          }
+        ],
+        "text": "Administration within a muscle"
+      },
+      "doseQuantity": {
+        "value": 0.5,
+        "units": "ML"
+      }
+    }
+    ]
+    }
+}

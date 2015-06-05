@@ -1,0 +1,4 @@
+*.swp
+set_environment.bat
+node_modules
+*.heapsnapshot

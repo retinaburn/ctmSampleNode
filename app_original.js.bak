@@ -1,0 +1,192 @@
+/*jshint node:true*/
+
+//------------------------------------------------------------------------------
+// app.js ZeroToSix - Middleware routing
+//------------------------------------------------------------------------------
+
+// For memory usage analysis
+//var heapdump = require('heapdump');
+
+
+// This application uses express as it's web server
+// for more info, see: http://expressjs.com
+var express = require( 'express' );
+
+// For handling the POST bodies and multi-part bodies0
+var bodyParser = require( 'body-parser' );
+var multer = require( 'multer' );
+
+// For parsing urls
+var url = require( 'url' );
+
+// For cloudant db
+var Cloudant = require( 'cloudant' );
+
+// Define the database names in cloudant
+var vidsDBName = 'vids';
+var irDBName = 'ir';
+
+// Define the objects to hold the db connection
+var vidsDB;
+var irDB;
+
+// cfenv provides access to your Cloud Foundry environment
+// for more info, see: https://www.npmjs.com/package/cfenv
+var cfenv = require('cfenv');
+
+// Create a new express server
+var app = express();
+
+// For handling the POST bodies
+app.use(bodyParser.json()); //for application/json
+//app.use( bodyParser.urlencoded({ extended: true }) ); //for application/x-www-form-urlencoded
+app.use( multer() );
+
+// Serve the files out of ./public as our main files
+//app.use(express.static(__dirname + '/public'));
+
+// Get the app environment from Cloud Foundry
+var appEnv = cfenv.getAppEnv();
+
+// Attempt to retrieve the username/password for cloudant
+var serviceCreds = appEnv.getServiceCreds( 'Cloudant NoSQL DB-tu' );
+var dbusername = '';
+var dbpassword = '';
+if ( serviceCreds ) {
+  dbusername = serviceCreds.username;
+  dbpassword = serviceCreds.password;
+}
+// Cloudant username and password
+var username = ( dbusername || process.env.username );
+var password = ( dbpassword || process.env.password );
+
+// Get the cloudant connection
+Cloudant( {account:username, password:password}, function( err, cloudant ) {
+  if ( err ) return console.error( 'Error connecting to Cloudant account %s:%s', username, err.message );
+  console.log( 'Connected to Cloudant' );
+
+  // get the vids connection 
+  vidsDB = cloudant.db.use( vidsDBName ); 
+
+  // get the IR connection
+  irDB = cloudant.db.use( irDBName );
+});
+
+snapshot();
+
+// Retrieve vaccine info from db for specified parameters
+// Return HTTP 200, and returned doc
+// Doc is empty if no matching record found
+//
+// Ex:  /vaccine?gtin=x&lotNum=y&expiryDate=z
+app.get( '/vaccine', function( req, res ){
+	logRequest( req );
+
+  console.log( 'Pulled: gtin = %s, lotNum = %s, expiryDate = %s ', req.query.gtin, req.query.lotNum, req.query.expiryDate ); 
+
+  vidsDB.find( { selector: 
+      { GTIN: req.query.gtin, 
+        LotNumber: req.query.lotNum, 
+        ExpiryDate: req.query.expiryDate}
+      } , function( err, result ){
+    if ( err ) return console.error( 'Error during get: ' + err.message );
+    console.log( 'Retrieved: ' );
+    console.log( result );
+    res.status(200).send( result );
+  });
+
+});
+
+// Retrieve IR info from db for id parameter
+// Return HTTP 404 if record with no matching id found
+// Return HTTP 200 and document if found
+//
+// Ex /getReceipt?id=xyz 
+app.get( '/getReceipt', function ( req, res ){
+  logRequest( req );
+  
+  irDB.get( req.query.id, function ( err, body ) {
+    if ( err ) {
+      console.error ( 'Failure retrieving ' + req.params.id + ' : ' + err.message );
+      res.status(404).send( 'No record found: ' + err.message );
+    }
+
+    res.status(200).send( body );
+  });
+})
+
+
+// Add IR info to db
+// POST is passed the json IR doc
+// TODO Return for failure
+// Return HTTP 200 and document id for inserted doc
+//
+// Ex /getReceipt?id=xyz 
+app.post( '/addReceipt', function ( req, res ){
+  logRequest( req );
+
+  //Store JSON document in Cloudant
+  irDB.insert( req.body, function( err, body) {
+    if ( err ) {
+      console.error( 'Err inserting IR doc: '+err.message );
+    }
+
+    if ( !err ){
+      console.log( 'Inserted: ' );
+      console.log( body );
+      res.status(200).send( body.id );
+    }
+  }); 
+});
+
+//TODO: ONLY FOR TESTING
+app.get( '/allReceipts', function ( req, res ){
+  snapshot();
+  logRequest( req );
+  irDB.list( function( err, body ) {
+    if ( err ) return console.error( 'Failure listing all receipts: ' + err.message );
+
+    res.status(200).send( body );
+  }); 
+  snapshot();
+});
+
+//TODO: ONLY FOR TESTING
+app.get( '/receipt/:id', function ( req, res ){
+  irDB.get( req.params.id, function( err, body ) {
+    if ( err ) return console.error ( 'Failure retrieving ' + req.params.id + ' : ' + err.message );
+    res.status(200).send( body );
+  });
+});
+
+// Catch all handlers for unhandled URLs
+//
+app.post( '/*', function( req, res ){
+	
+	res.send( 'Unhandled POST received' );
+});
+
+app.get( '/*', function( req, res ){
+  snapshot();
+	logRequest( req );
+	res.send( 'Unhandled GET received' );
+  snapshot();
+});
+
+
+// start server on the specified port and binding host
+app.listen(appEnv.port, appEnv.bind, function() {
+
+	// print a message when the server starts listening
+  console.log("server starting on -- " + appEnv.url);
+});
+
+function logRequest(req){
+	console.log("Received,"+new Date().toLocaleString()+","+req.method+","+req.originalUrl);
+}
+function snapshot(){
+//  heapdump.writeSnapshot(function(err, filename) {
+//    console.log('dump written to', filename);
+//  });
+}
+
